@@ -42,10 +42,8 @@ A machine learning project that predicts the likelihood of customer churn using 
 Customer_Churn_Predictor/
 ├── data/
 │   ├── WA_Fn-UseC_-Telco-Customer-Churn.csv          # Original dataset
-│   ├── cleaned_telco.csv                             # Cleaned & encoded data
-├── notebooks/
-│   ├── 01_data_preprocessing.ipynb                   # Cleaning + EDA
-│   ├── 02_model_building.ipynb                       # Neural network model + Evaluation
+├── notebook/
+│   ├── churn_predictor.ipynb                         # Preprocessing + Neural network model
 ├── models/
 │   ├── final_model.keras                             # Trained deep learning model
 │   ├── scaler.pkl                                    # Scaling for numerical features
