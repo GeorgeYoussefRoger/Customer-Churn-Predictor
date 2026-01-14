@@ -1,93 +1,88 @@
-# 📊 Customer Churn Predictor
-
-A machine learning project that predicts the likelihood of customer churn using the Telco Customer Churn dataset. This project demonstrates ML and DL skills — including data preprocessing, exploratory data analysis (EDA), model training, evaluation and deployment through a Streamlit app.
+# 🏃 Customer Churn Predictor
+A machine learning project that predicts customer churn using the Telco Customer Churn dataset. 
+The project implements an end-to-end pipeline from data preprocessing and EDA to deep learning model training and deployment via a Streamlit web application.
 
 ## 🚀 Features
-
-- Full machine learning pipeline from raw data to web deployment
-- Data cleaning, encoding, and standardization
-- Exploratory Data Analysis (EDA) with churn-based visualizations
-- Deep learning model with TensorFlow/Keras
-- Interactive Streamlit app for real-time churn prediction
+- End-to-end ML pipeline from raw data to production-ready web app
+- Automated preprocessing and feature scaling for consistent inference
+- EDA revealing key churn drivers such as tenure and monthly charges
+- Deep learning classifier optimized for imbalanced churn prediction
+- Interactive Streamlit app providing real-time churn probability and risk level
 
 ## 🧠 Methodology
+1. **Data Preprocessing**
+   - Removed irrelevant columns and handled missing values
+   - Encoded categorical variables using One-Hot Encoding
+   - Scaled numerical features (`tenure`, `MonthlyCharges`, `TotalCharges`) using `StandardScaler` to improve neural network convergence
 
-🧹 Data Preprocessing
+2. **Exploratory Data Analysis (EDA)**
+   - Analyzed **Tenure vs. Churn** to understand retention patterns
+   - Examined **Monthly Charges vs. Churn** to identify pricing-related churn behavior
 
-- Removed irrelevant columns and handled missing values
-- Converted categorical variables to numeric via One-Hot Encoding
-- Scaled numerical features (tenure, MonthlyCharges, TotalCharges) using StandardScaler
+3. **Model Training**
+   - Built a Sequential neural network using TensorFlow/Keras  
+   - Architecture: `Input → Dense(26, ReLU) → Dense(13, ReLU) → Dense(1, Sigmoid)`
+   - Optimizer: Adam  
+   - Loss Function: Binary Crossentropy  
+   - Evaluated performance using confusion matrix and classification report
 
-📊 Exploratory Data Analysis (EDA)
+4. **Handling Class Imbalance**
+   - Observed imbalance between churned and non-churned customers
+   - Applied stratified train-test splitting
+   - Used class-weighted loss to penalize false negatives (missed churn cases)
 
-- Visualized churn patterns across features such as:
-  - Tenure vs. Churn — to identify retention trends
-  - Monthly Charges vs. Churn — to study spending-related churn behavior
-
-🤖 Model Training
-
-- Built a Sequential Neural Network using TensorFlow/Keras:
-  - Input → Dense(26, ReLU) → Dense(13, ReLU) → Dense(1, Sigmoid)
-  - Optimized with Adam and Binary Crossentropy
-  - Evaluated with confusion matrix, and classification report
-
-⚙️ Deployment
-
-- Exported the final model (.keras format)
-- Developed a Streamlit UI for user-friendly prediction
+5. **Deployment**
+   - Exported the trained model in `.keras` format
+   - Persisted feature scaler using `joblib`
+   - Deployed the model via a Streamlit web application that:
+     - Accepts customer inputs
+     - Outputs churn probability
+     - Classifies risk as Low / Moderate / High
 
 ## 📂 Project Structure
-
 ```
 Customer_Churn_Predictor/
 ├── data/
-│   ├── WA_Fn-UseC_-Telco-Customer-Churn.csv          # Original dataset
-│   ├── cleaned_telco.csv                             # Cleaned & encoded data
-├── notebooks/
-│   ├── 01_data_preprocessing.ipynb                   # Cleaning + EDA
-│   ├── 02_model_building.ipynb                       # Neural network model + Evaluation
+│   └── WA_Fn-UseC_-Telco-Customer-Churn.csv          # Original dataset
+├── notebook/
+│   └── churn_predictor.ipynb                         # EDA, preprocessing, and model training
 ├── models/
 │   ├── final_model.keras                             # Trained deep learning model
-│   ├── scaler.pkl                                    # Scaling for numerical features
+│   └── scaler.pkl                                    # Scaling for numerical features
 ├── ui/
-│   ├── app.py                                        # Streamlit app
+│   └── app.py                                        # Streamlit app
 ├── requirements.txt                                  # Dependencies
-├── README.md                                         # Documentation
+├── README.md                                         
 ├── .gitignore
-├── LICENSE
+└── LICENSE
 ```
 
 ## 🧰 Technologies Used
-
-- Python — pandas, scikit-learn, tensorflow, keras, matplotlib, seaborn
-- Web App — Streamlit
+- Language: Python (3.12)
+- Data Analysis: `Pandas`
+- Data Visualization: `Matplotlib` `Seaborn`
+- Machine Learning and Deep Learning: `Scikit-Learn` `TensorFlow` `Keras`
+- Model Persistence: `Joblib`
+- Web App & Deployment: `Streamlit`
 
 ## 📦 Installation & Usage
-
-1️⃣ Clone the repository
-
+1. Clone the repository
 ```
 git clone https://github.com/GeorgeYoussefRoger/Customer-Churn-Predictor.git
 cd Customer-Churn-Predictor
 ```
-
-2️⃣ Install dependencies
-
+2. Install dependencies
 ```
 pip install -r requirements.txt
 ```
-
-3️⃣ Run the Streamlit app
-
+3. Run the Streamlit app
 ```
 streamlit run ui/app.py
 ```
 
 ## 📂 Dataset
-
 - Source: [Kaggle - Telco Customer Churn](https://www.kaggle.com/datasets/blastchar/telco-customer-churn)
 
 ## 📜 License
-
 - This project is licensed under the MIT License.
 - See the `LICENSE` file for more details.
