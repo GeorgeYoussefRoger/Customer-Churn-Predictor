@@ -1,6 +1,6 @@
 # 🏃 Customer Churn Predictor
 A machine learning project that predicts customer churn using the Telco Customer Churn dataset. 
-The project implements an end-to-end pipeline from data preprocessing and EDA to deep learning model training and deployment via a Streamlit web application.
+The project implements an end-to-end machine learning pipeline from data preprocessing and exploratory analysis to deep learning model training and deployment via a Streamlit web application.
 
 ## 🚀 Features
 - End-to-end ML pipeline from raw data to production-ready web app
@@ -12,40 +12,38 @@ The project implements an end-to-end pipeline from data preprocessing and EDA to
 ## 🧠 Methodology
 1. **Data Preprocessing**
    - Removed irrelevant columns and handled missing values
-   - Encoded categorical variables using One-Hot Encoding
-   - Scaled numerical features (`tenure`, `MonthlyCharges`, `TotalCharges`) using `StandardScaler` to improve neural network convergence
+   - Converted inconsistent data types
 
 2. **Exploratory Data Analysis (EDA)**
    - Analyzed **Tenure vs. Churn** to understand retention patterns
    - Examined **Monthly Charges vs. Churn** to identify pricing-related churn behavior
 
-3. **Model Training**
+3. **Feature Engineering**
+   - Encoded categorical variables using binary and one-hot encoding
+   - Applied stratified train-test splitting  
+   - Scaled numerical features using StandardScaler (fit on training data only)
+
+4. **Model Training**
    - Built a Sequential neural network using TensorFlow/Keras  
-   - Architecture: `Input → Dense(26, ReLU) → Dense(13, ReLU) → Dense(1, Sigmoid)`
+   - Architecture: `Input → Dense(32, ReLU) → Dense(16, ReLU) → Dense(1, Sigmoid)`
    - Optimizer: Adam  
    - Loss Function: Binary Crossentropy  
+   - Handled class imbalance using class-weighted loss
    - Evaluated performance using confusion matrix and classification report
-
-4. **Handling Class Imbalance**
-   - Observed imbalance between churned and non-churned customers
-   - Applied stratified train-test splitting
-   - Used class-weighted loss to penalize false negatives (missed churn cases)
-
-5. **Deployment**
-   - Exported the trained model in `.keras` format
-   - Persisted feature scaler using `joblib`
-   - Deployed the model via a Streamlit web application that:
-     - Accepts customer inputs
-     - Outputs churn probability
-     - Classifies risk as Low / Moderate / High
 
 ## 📂 Project Structure
 ```
 Customer_Churn_Predictor/
 ├── data/
-│   └── WA_Fn-UseC_-Telco-Customer-Churn.csv          # Original dataset
+│   ├── WA_Fn-UseC_-Telco-Customer-Churn.csv          # Telco raw dataset
+│   ├── X_train.csv
+│   ├── X_test.csv
+│   ├── y_train.csv
+│   └── y_test.csv
 ├── notebook/
-│   └── churn_predictor.ipynb                         # EDA, preprocessing, and model training
+│   ├── 01_data_preprocessing_eda.ipynb               # Data preprocessing + EDA
+│   ├── 02_feature_engineering.ipynb                  # Feature engineering + Train-Test split
+│   └── 03_model_training.ipynb                       # Model training + Evaluation
 ├── models/
 │   ├── final_model.keras                             # Trained deep learning model
 │   └── scaler.pkl                                    # Scaling for numerical features
