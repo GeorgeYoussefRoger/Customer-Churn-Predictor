@@ -4,7 +4,7 @@ A Machine Learning–based Customer Churn Prediction system that estimates the p
 ## 🚀 Features
 - Predict customer churn probability based on demographic, service, and billing information
 - End-to-end ML pipelines combining preprocessing, SMOTE, and classification
-- Model comparison using cross-validated ROC-AUC
+- Model comparison using cross-validated f1-score
 - Hyperparameter tuning using GridSearchCV
 - Single production-ready pipeline saved as a `.pkl` file
 - Interactive Streamlit web interface for real-time predictions
@@ -35,19 +35,18 @@ A Machine Learning–based Customer Churn Prediction system that estimates the p
         - SMOTE for class imbalance handling
         - Classification model
     - Trained and compared multiple classifiers:
-        - Logistic Regression (best performing)
+        - Logistic Regression 
         - Random Forest
-        - Gradient Boosting
-        - Support Vector Machine
+        - Gradient Boosting (best performing)
     - Evaluated models using:
-        - 5-fold cross-validated ROC-AUC (mean & standard deviation)
-        - Precision, Recall, and F1-score on the test set
-        - Selected the best baseline model based on ROC-AUC
+        - 5-fold cross-validated f1-score (mean & standard deviation)
+        - Precision, Recall on the test set
+        - Selected the best baseline model based on f1-score
         - Saved artifact: `base_pipeline.pkl`
 
 - Hyperparameter Tuning
-    - Tuned Logistic Regression using `GridSearchCV`
-    - Used ROC-AUC as the optimization metric
+    - Tuned Gradient Boosting using `GridSearchCV`
+    - Used f1-score as the optimization metric
     - Evaluated tuned model on test data
     - Saved final optimized pipeline
 
@@ -71,7 +70,7 @@ Customer-Churn-Predictor/
 │ ├── 01_data_preprocessing_eda.ipynb       # Cleaning and EDA
 │ ├── 02_feature_engineering.ipynb          # Encoding and train-test split
 │ ├── 03_model_training.ipynb               # Pipeline-based model comparison
-│ └── 04_hyperparameter_tuning.ipynb        # Logistic Regression tuning
+│ └── 04_hyperparameter_tuning.ipynb        # Gradient Boosting tuning
 ├── models/
 │ ├── base_pipeline.pkl                     # Best baseline pipeline
 │ └── final_pipeline.pkl                    # Tuned final pipeline
