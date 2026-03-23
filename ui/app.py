@@ -7,7 +7,6 @@ API_URL = os.getenv("API_URL", "http://localhost:8000")
 st.set_page_config(layout="wide")
 st.title("📉 Customer Churn Predictor")
 st.write("Enter customer information.")
-st.caption(f"API: {API_URL}")
 
 col1, col2, col3 = st.columns(3)
 

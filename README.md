@@ -2,8 +2,6 @@
 
 An end-to-end Machine Learning system that predicts customer churn using a production-style pipeline, with experiment tracking, hyperparameter tuning, and a deployed API + interactive UI.
 
-> 🌐 Live Demo: https://ui-url (Coming Soon)
-
 > Built on the [IBM Telco Customer Churn dataset](https://www.kaggle.com/datasets/blastchar/telco-customer-churn)
 
 ## 🚀 Features
