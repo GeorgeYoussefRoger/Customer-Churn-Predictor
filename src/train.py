@@ -1,5 +1,5 @@
 import mlflow
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_val_score, StratifiedKFold
 
 from src.evaluate import evaluate
 
@@ -10,7 +10,8 @@ def train(X_train, X_test, y_train, y_test, pipeline, name):
     with mlflow.start_run(run_name=f'{name}_Baseline'):
 
         print(f"Training {name}...")
-        cv_pr_auc = cross_val_score(pipeline, X_train, y_train, cv=5, scoring='average_precision').mean()
+        cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+        cv_pr_auc = cross_val_score(pipeline, X_train, y_train, cv=cv, scoring='average_precision').mean()
         pipeline.fit(X_train, y_train)
             
         metrics = evaluate(pipeline, X_test, y_test)

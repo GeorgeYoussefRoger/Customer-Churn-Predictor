@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY api/requirements.txt requirements.txt
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --timeout=600 -r requirements.txt
 
 COPY . .
 

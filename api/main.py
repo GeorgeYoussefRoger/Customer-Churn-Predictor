@@ -56,8 +56,7 @@ def predict(data: CustomerData):
     df = pd.DataFrame([data.model_dump()])
     try:
         proba = pipeline.predict_proba(df)[:, 1][0]
+        return {"churn_probability": float(proba), 
+                "churn_prediction": int(proba >= threshold)}
     except Exception as e:
         return {"error": str(e)}
-
-    return {"churn_probability": float(proba), 
-            "churn_prediction": int(proba >= threshold)}

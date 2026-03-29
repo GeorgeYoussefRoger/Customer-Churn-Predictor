@@ -30,8 +30,8 @@ def run_pipeline():
     df = load_data('data/WA_Fn-UseC_-Telco-Customer-Churn.csv')
     df = preprocess(df)
 
-    X = df.drop(columns=[TARGET_COL])
-    y = df[TARGET_COL]
+    X = df.drop(columns=['Churn'])
+    y = df['Churn']
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=TEST_SIZE, random_state=RANDOM_STATE, stratify=y)
 
@@ -50,14 +50,15 @@ def run_pipeline():
     for name in top2:
         model = MODELS[name]
         pipeline = build_pipeline(model)
-        threshold, test_pr_auc = tune(X_train, X_test, y_train, y_test, pipeline, name)
+        test_pr_auc, tuned_pipeline, threshold = tune(X_train, X_test, y_train, y_test, pipeline, name)
         if test_pr_auc > best_score:
             best_score = test_pr_auc
-            best_pipeline = pipeline
+            best_pipeline = tuned_pipeline
             best_pipeline_name = name
             best_threshold = threshold
 
-    print(f"Best model after tuning: {best_pipeline_name} with Test PR-AUC: {best_score:.4f} at threshold {best_threshold:.4f}")
+    print(f"Best model: {best_pipeline_name} with Test PR-AUC: {best_score:.4f} at threshold {best_threshold:.4f}")
+    
     os.makedirs('models', exist_ok=True)
     joblib.dump({"model": best_pipeline, "threshold": best_threshold}, os.path.join('models', 'final_model.pkl'))
 

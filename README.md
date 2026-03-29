@@ -87,14 +87,14 @@ docker-compose up --build
 
 ## 📊 Model Performance
 
-The best performing model was **XGBoost**, selected after baseline comparison and hyperparameter tuning.
+- CatBoost outperformed Logistic Regression and LightGBM in PR-AUC after tuning.
 
 - Test Set Metrics:
-  - PR-AUC (Primary Metric): 0.65
-  - Precision: 0.50
-  - Recall: 0.78
-  - F1: 0.61
-  - Best Threshold: 0.60
+  - PR-AUC (Primary Metric): 0.66
+  - Precision: 0.65
+  - Recall: 0.52
+  - F1: 0.58
+  - Best Threshold: 0.41
 - Notes:
   - PR-AUC was used as the primary metric due to class imbalance
   - Threshold was optimized using F1-score to balance precision and recall
@@ -103,9 +103,9 @@ The best performing model was **XGBoost**, selected after baseline comparison an
 
 ```
 Customer-Churn-Predictor/
-├── .github/workflows/     # Github Actions CI/CD
+├── .github/workflows/     # GitHub Actions CI/CD
 ├── api/                   # FastAPI
-├── data/                  # Telco Dataset
+├── data/                  # IBM Telco Dataset
 ├── models/                # Trained Models
 ├── notebooks/             # Exploration Notebook
 ├── src/                   # ML Pipeline
