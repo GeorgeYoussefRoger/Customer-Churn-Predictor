@@ -5,12 +5,23 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from catboost import CatBoostClassifier
 
-from src.config import *
-from src.load_data import load_data
-from src.preprocess import preprocess
+from src.config import ( 
+    RANDOM_STATE, TEST_SIZE, MLFLOW_TRACKING_URI, MLFLOW_EXPERIMENT, MODELS_DIR, NUMERICAL_FEATURES, CATEGORICAL_FEATURES
+)
+from src.preprocess import load_data
+from src.preprocess import clean_data
 from src.train import train
 from src.tune import tune
+
+MODELS = {
+    'LogisticRegression': LogisticRegression(random_state=RANDOM_STATE),
+    'RandomForest': RandomForestClassifier(n_jobs=-1, random_state=RANDOM_STATE),
+    'CatBoost': CatBoostClassifier(verbose=0, random_state=RANDOM_STATE)
+}
 
 def build_pipeline(model):
     preprocessor = ColumnTransformer(transformers=[
@@ -23,12 +34,12 @@ def build_pipeline(model):
         ('model', model)
     ])
 
-def run_pipeline():
-    mlflow.set_tracking_uri('mlruns')
-    mlflow.set_experiment('Customer-Churn-Prediction')
+def main():
+    mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+    mlflow.set_experiment(MLFLOW_EXPERIMENT)
 
-    df = load_data('data/WA_Fn-UseC_-Telco-Customer-Churn.csv')
-    df = preprocess(df)
+    df = load_data()
+    df = clean_data(df)
 
     X = df.drop(columns=['Churn'])
     y = df['Churn']
@@ -41,6 +52,9 @@ def run_pipeline():
         cv_pr_auc = train(X_train, X_test, y_train, y_test, pipeline, name)
         baseline_scores[name] = cv_pr_auc
 
+    print("Baseline Scores:")
+    for name, score in baseline_scores.items():
+        print(f"  {name}: {score:.4f}")
     top2 = sorted(baseline_scores, key=baseline_scores.get, reverse=True)[:2]
 
     best_score = -float('inf')
@@ -59,8 +73,8 @@ def run_pipeline():
 
     print(f"Best model: {best_pipeline_name} with Test PR-AUC: {best_score:.4f} at threshold {best_threshold:.4f}")
     
-    os.makedirs('models', exist_ok=True)
-    joblib.dump({"model": best_pipeline, "threshold": best_threshold}, os.path.join('models', 'final_model.pkl'))
+    os.makedirs(MODELS_DIR, exist_ok=True)
+    joblib.dump({"model": best_pipeline, "threshold": best_threshold}, os.path.join(MODELS_DIR, 'final_model.pkl'))
 
 if __name__ == "__main__":
-    run_pipeline()
+    main()

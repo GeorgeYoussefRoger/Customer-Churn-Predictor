@@ -2,9 +2,6 @@ import numpy as np
 from sklearn.metrics import precision_score, recall_score, f1_score, average_precision_score, precision_recall_curve
 
 def evaluate(model, X_test, y_test):
-    """
-    Evaluate a trained model and return key metrics + optimal threshold.
-    """
     y_pred = model.predict(X_test)
     y_proba = model.predict_proba(X_test)[:, 1]
 

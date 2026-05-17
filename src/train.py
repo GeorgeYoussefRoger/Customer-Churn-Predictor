@@ -4,9 +4,6 @@ from sklearn.model_selection import cross_val_score, StratifiedKFold
 from src.evaluate import evaluate
 
 def train(X_train, X_test, y_train, y_test, pipeline, name):
-    """
-    Train models and log results to MLflow.
-    """
     with mlflow.start_run(run_name=f'{name}_Baseline'):
 
         print(f"Training {name}...")

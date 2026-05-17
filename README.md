@@ -19,11 +19,8 @@ An end-to-end Machine Learning system that predicts customer churn using a produ
 
 ## 📦 Installation & Usage
 
-### Prerequisites
-
-- Python 3.12+
-
-### Run Locally
+- Prerequisites
+  - Python 3.12+
 
 1. Clone the repository
 
@@ -42,59 +39,66 @@ python -m venv .venv
 source .venv/bin/activate
 ```
 
-3. Install dependencies
-
-```
-pip install -r requirements.txt
-```
-
-4. Train Model
-
-```
-python -m src.pipeline
-```
-
-5. Run API
+3. Run API
 
 ```
 pip install -r api/requirements.txt
 uvicorn api.main:app
 ```
 
-6. Run UI
+4. Run UI
 
 ```
 pip install -r ui/requirements.txt
 streamlit run ui/app.py
 ```
 
-7. Access:
+5. Access:
    - UI -> http://localhost:8501
    - API Docs -> http://localhost:8000/docs
 
-### Run with Docker (Recommended)
+## 🐋 Run with Docker (Recommended)
 
-1. Build Docker images (API + UI)
+- Build Docker images (API + UI)
 
 ```
 docker-compose up --build
 ```
 
-2. Access:
+- Access:
+  - UI -> http://localhost:8501
+  - API Docs -> http://localhost:8000/docs
 
-- UI -> http://localhost:8501
-- API Docs -> http://localhost:8000/docs
+## 🧠 Training
 
-## 📊 Model Performance
+- Install dependencies
 
-- CatBoost outperformed Logistic Regression and LightGBM in PR-AUC after tuning.
+```
+pip install -r requirements.txt
+```
+
+- Train Models
+
+```
+python -m src.main
+```
+
+- View MLflow experiments
+
+```
+mlflow server --backend-store-uri sqlite:///mlruns.db
+```
+
+## 🤖 Model Details
+
+- CatBoost outperformed Logistic Regression and Random Forest in PR-AUC after tuning.
 
 - Test Set Metrics:
-  - PR-AUC (Primary Metric): 0.66
+  - PR-AUC (Primary Metric): 0.65
   - Precision: 0.65
   - Recall: 0.52
   - F1: 0.58
-  - Best Threshold: 0.41
+  - Best Threshold: 0.30
 - Notes:
   - PR-AUC was used as the primary metric due to class imbalance
   - Threshold was optimized using F1-score to balance precision and recall
@@ -115,5 +119,4 @@ Customer-Churn-Predictor/
 
 ## 📜 License
 
-- This project is licensed under the MIT License.
-- See the [LICENSE](LICENSE) file for more details.
+This project is licensed under the MIT License.

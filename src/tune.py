@@ -7,15 +7,19 @@ from src.config import RANDOM_STATE
 from src.evaluate import evaluate
 
 def tune(X_train, X_test, y_train, y_test, pipeline, name):
-    """
-    Tune best model using Optuna and log results to MLflow.
-    """
     def objective(trial):   
         if name == 'LogisticRegression':
             params = {
                 'model__C': trial.suggest_float('model__C', 0.01, 100, log=True),
                 'model__max_iter': trial.suggest_int('model__max_iter', 100, 1000),
                 'model__class_weight': trial.suggest_categorical('model__class_weight', ['balanced', None])
+            }
+        elif name == 'RandomForest':
+            params = {
+                'model__n_estimators': trial.suggest_int('model__n_estimators', 100, 1000),
+                'model__max_depth': trial.suggest_int('model__max_depth', 4, 20),
+                'model__min_samples_split': trial.suggest_int('model__min_samples_split', 2, 10),
+                'model__min_samples_leaf': trial.suggest_int('model__min_samples_leaf', 1, 5),
             }
         elif name == 'CatBoost':
             params = {
@@ -24,14 +28,7 @@ def tune(X_train, X_test, y_train, y_test, pipeline, name):
                 'model__learning_rate': trial.suggest_float('model__learning_rate', 0.01, 0.2, log=True),
                 'model__l2_leaf_reg': trial.suggest_float('model__l2_leaf_reg', 1, 10),
             }
-        elif name == 'LightGBM':
-            params = {
-                'model__n_estimators': trial.suggest_int('model__n_estimators', 200, 1000),
-                'model__num_leaves': trial.suggest_int('model__num_leaves', 31, 63),
-                'model__learning_rate': trial.suggest_float('model__learning_rate', 0.01, 0.2, log=True),
-                'model__feature_fraction': trial.suggest_float('model__feature_fraction', 0.6, 1.0),
-                'model__bagging_fraction': trial.suggest_float('model__bagging_fraction', 0.6, 1.0),
-            }
+        
         trial_pipeline = clone(pipeline)
         trial_pipeline.set_params(**params)
         cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=RANDOM_STATE)

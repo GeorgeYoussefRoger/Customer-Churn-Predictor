@@ -208,4 +208,5 @@ __marimo__/
 
 # Project specific
 mlruns/
+mlruns.db
 catboost_info/

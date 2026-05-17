@@ -3,6 +3,8 @@ name: CI
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   test-and-build:
@@ -16,14 +18,21 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: "pip"
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Run Pipelines
-        run: python -m src.pipeline
+      - name: Lint
+        run: |
+          pip install ruff
+          ruff check .
 
       - name: Build Docker images
         run: |
           docker build -t api -f api/Dockerfile .
           docker build -t ui -f ui/Dockerfile .
+
+      - name: Run API health check
+        run: |
+          docker run -d --name api-test -p 8000:8000 api
+          sleep 5
+          curl --fail http://localhost:8000/health || (docker logs api-test && exit 1)
+          docker stop api-test

@@ -1,13 +1,16 @@
+import os
 import pandas as pd
 
-def preprocess(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Cleaning for the Telco Customer Churn dataset:
-    - Drop 'customerID' column
-    - Convert 'TotalCharges' to numeric 
-    - Map 'Churn' to binary
-    - Replace 'No internet service' and 'No phone service' with 'No'
-    """
+from src.config import DATA_DIR
+
+def load_data():
+    file_path = os.path.join(DATA_DIR, 'WA_Fn-UseC_-Telco-Customer-Churn.csv')
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"Data file not found: {file_path}")
+
+    return pd.read_csv(file_path)
+
+def clean_data(df):
     df = df.drop(columns=['customerID'])
 
     df['TotalCharges'] = pd.to_numeric(df['TotalCharges'], errors='coerce')
