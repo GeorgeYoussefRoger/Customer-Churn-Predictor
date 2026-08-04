@@ -1,13 +1,13 @@
 import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
 
-def preprocess(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Cleaning for the Telco Customer Churn dataset:
-    - Drop 'customerID' column
-    - Convert 'TotalCharges' to numeric 
-    - Map 'Churn' to binary
-    - Replace 'No internet service' and 'No phone service' with 'No'
-    """
+from src.config import DATA_FILE, RANDOM_STATE, TEST_SIZE, NUMERICAL_FEATURES, CATEGORICAL_FEATURES
+
+def preprocess():
+    df = pd.read_csv(DATA_FILE)
+
     df = df.drop(columns=['customerID'])
 
     df['TotalCharges'] = pd.to_numeric(df['TotalCharges'], errors='coerce')
@@ -17,4 +17,16 @@ def preprocess(df: pd.DataFrame) -> pd.DataFrame:
     df = df.replace('No internet service', 'No')
     df = df.replace('No phone service', 'No')
 
-    return df
+    X = df.drop(columns=['Churn'])
+    y = df['Churn']
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=TEST_SIZE, random_state=RANDOM_STATE, stratify=y)
+
+    return X_train, X_test, y_train, y_test
+
+def create_preprocessor():
+    return ColumnTransformer(transformers=[
+            ('num', StandardScaler(), NUMERICAL_FEATURES),
+            ('cat', OneHotEncoder(drop='first', handle_unknown='ignore'), CATEGORICAL_FEATURES)
+        ]
+    )

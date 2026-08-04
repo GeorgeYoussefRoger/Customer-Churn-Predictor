@@ -1,64 +1,59 @@
 import optuna
 import mlflow
 from sklearn.model_selection import cross_val_score, StratifiedKFold
-from sklearn.base import clone
 
 from src.config import RANDOM_STATE
 from src.evaluate import evaluate
 
-def tune(X_train, X_test, y_train, y_test, pipeline, name):
-    """
-    Tune best model using Optuna and log results to MLflow.
-    """
-    def objective(trial):   
+def tune(X_train, X_test, y_train, y_test, model, name):
+    def objective(trial):
         if name == 'LogisticRegression':
             params = {
-                'model__C': trial.suggest_float('model__C', 0.01, 100, log=True),
-                'model__max_iter': trial.suggest_int('model__max_iter', 100, 1000),
-                'model__class_weight': trial.suggest_categorical('model__class_weight', ['balanced', None])
+                'C': trial.suggest_float('C', 0.01, 100, log=True),
+                'class_weight': trial.suggest_categorical('class_weight', [None, 'balanced'])
             }
-        elif name == 'CatBoost':
+        elif name == 'RandomForest':
             params = {
-                'model__iterations': trial.suggest_int('model__iterations', 200, 1000),
-                'model__depth': trial.suggest_int('model__depth', 4, 8),
-                'model__learning_rate': trial.suggest_float('model__learning_rate', 0.01, 0.2, log=True),
-                'model__l2_leaf_reg': trial.suggest_float('model__l2_leaf_reg', 1, 10),
+                'n_estimators': trial.suggest_int('n_estimators', 100, 500),
+                'max_depth': trial.suggest_int('max_depth', 4, 20),
+                'min_samples_split': trial.suggest_int('min_samples_split', 2, 10),
+                'min_samples_leaf': trial.suggest_int('min_samples_leaf', 1, 5),
+                'max_features': trial.suggest_categorical('max_features', ['sqrt', 'log2'])
             }
         elif name == 'LightGBM':
             params = {
-                'model__n_estimators': trial.suggest_int('model__n_estimators', 200, 1000),
-                'model__num_leaves': trial.suggest_int('model__num_leaves', 31, 63),
-                'model__learning_rate': trial.suggest_float('model__learning_rate', 0.01, 0.2, log=True),
-                'model__feature_fraction': trial.suggest_float('model__feature_fraction', 0.6, 1.0),
-                'model__bagging_fraction': trial.suggest_float('model__bagging_fraction', 0.6, 1.0),
+                'n_estimators': trial.suggest_int('n_estimators', 100, 1000),
+                'max_depth': trial.suggest_int('max_depth', 4, 20),
+                'learning_rate': trial.suggest_float('learning_rate', 0.01, 0.3, log=True),
+                'num_leaves': trial.suggest_int('num_leaves', 20, 200),
+                'min_child_samples': trial.suggest_int('min_child_samples', 5, 100),
             }
-        trial_pipeline = clone(pipeline)
-        trial_pipeline.set_params(**params)
-        cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=RANDOM_STATE)
-        return cross_val_score(trial_pipeline, X_train, y_train, cv=cv, scoring='average_precision').mean()
 
-    with mlflow.start_run(run_name=f'{name}_Tuned'):
-        print(f"Tuning {name} with Optuna...")
+        model.set_params(**params)
+        cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=RANDOM_STATE)
+        return cross_val_score(model, X_train, y_train, cv=cv, scoring='average_precision').mean()
+
+    with mlflow.start_run(run_name=f"{name}_tuned"):
+        print(f"Tuning {name}...")
         study = optuna.create_study(direction='maximize')
         study.optimize(objective, n_trials=20)
 
         best_params = study.best_params
-        tuned_pipeline = clone(pipeline)
-        tuned_pipeline.set_params(**best_params)
-        tuned_pipeline.fit(X_train, y_train)
+        tuned_model = model.set_params(**best_params)
+        tuned_model.fit(X_train, y_train)
 
-        metrics = evaluate(tuned_pipeline, X_test, y_test)
-        mlflow.log_metric("Precision", metrics["precision"])
-        mlflow.log_metric("Recall", metrics["recall"])
-        mlflow.log_metric("F1 Score", metrics["f1"])
-        mlflow.log_metric("CV PR-AUC", study.best_value)
-        mlflow.log_metric("Best Threshold", metrics["threshold"])
-        mlflow.log_metric("Test PR-AUC", metrics["test_pr_auc"])
+        metrics = evaluate(tuned_model, X_test, y_test)
+            
+        mlflow.log_metrics({
+            "Precision": metrics["Precision"],
+            "Recall": metrics["Recall"],
+            "CV PR-AUC": study.best_value,
+            "Test PR-AUC": metrics["PR-AUC"]
+        })
 
         mlflow.log_params(best_params)
-        mlflow.sklearn.log_model(tuned_pipeline, name="model")
-
+        print(f"Best parameters for {name}: {best_params}")
         print(f"{name} CV PR-AUC: {study.best_value:.4f}")
-        print(f"{name} Test PR-AUC: {metrics['test_pr_auc']:.4f}")
-
-    return metrics['test_pr_auc'], tuned_pipeline, metrics['threshold']
+        print(f"{name} Test PR-AUC: {metrics['PR-AUC']:.4f}")
+        
+        return tuned_model

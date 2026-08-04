@@ -4,19 +4,12 @@ from fastapi.middleware.cors import CORSMiddleware
 import joblib
 import pandas as pd
 
-try:
-    model = joblib.load('models/final_model.pkl')
-except Exception as e:
-    raise RuntimeError(f"Failed to load model: {e}")
-
-pipeline = model['model']
-threshold = model['threshold']
-
+pipeline = joblib.load("models/final_pipeline.pkl")
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:8501"],
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=True,
@@ -45,18 +38,15 @@ class CustomerData(BaseModel):
 
 @app.get("/")
 def root():
-    return {"message": "Welcome to the Customer Churn Prediction API"}
-
-@app.get("/health")
-def health():
     return {"status": "ok"}
 
 @app.post("/predict")
 def predict(data: CustomerData):
     df = pd.DataFrame([data.model_dump()])
     try:
-        proba = pipeline.predict_proba(df)[:, 1][0]
-        return {"churn_probability": float(proba), 
-                "churn_prediction": int(proba >= threshold)}
+        prediction = pipeline.predict(df)
+        probability = pipeline.predict_proba(df)[:, 1]
+        return {"prediction": int(prediction[0]), 
+                "probability": float(probability[0])}
     except Exception as e:
         return {"error": str(e)}

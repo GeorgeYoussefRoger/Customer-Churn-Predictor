@@ -1,8 +1,5 @@
 import streamlit as st
 import requests
-import os
-
-API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 st.set_page_config(layout="wide")
 st.title("📉 Customer Churn Predictor")
@@ -80,15 +77,16 @@ if st.button("Predict", use_container_width=True):
 
     with st.spinner("Calculating churn risk..."):
         try:
-            response = requests.post(f"{API_URL}/predict", json=payload, timeout=10)
+            response = requests.post(f"http://localhost:8000/predict", json=payload, timeout=10)
             response.raise_for_status()
-            prediction = response.json()["churn_prediction"]
-            proba = response.json()["churn_probability"]
+            pred = response.json()["prediction"]
+            proba = response.json()["probability"]
         except Exception as e:
             st.error(f"Error: {e}")
             st.stop()
 
-    if prediction == 1:
-        st.error(f"High Churn Risk ({proba:.2%})")
+    st.metric(label="Churn Probability", value=f"{proba:.2%}")
+    if pred == 1:
+        st.error(f"High Churn Risk")
     else:
-        st.success(f"Low Churn Risk ({proba:.2%})")
+        st.success(f"Low Churn Risk")
